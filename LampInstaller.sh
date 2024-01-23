@@ -54,7 +54,7 @@ echo "Create Virtual Host for Web"
 sudo mkdir /var/www/testdomain
 chown -R $USER:$USER /var/www/your_domain
 
-sudo apt install nano -y
+apt install nano -y
 
 echo "Config backup"
 
@@ -63,6 +63,18 @@ cp /etc/apache2/sites-available/*.conf /etc/apache2/sites-available/backup/
 
 echo "Copy config"
 cp  ./testconfig.conf /etc/apache2/sites-available/testdomain.conf
+
+apt install php-curl php-gd php-mbstring php-xml php-xmlrpc php-soap php-intl php-zip
+
+systemctl restart apache2
+
+cp  ./testconfig.conf /etc/apache2/sites-available/wordpress.conf
+
+a2enmod rewrite
+
+apache2ctl configtest
+
+sudo systemctl restart apache2
 
 
 echo "Test"
@@ -84,3 +96,5 @@ else
 fi
 
 while read LINE; do checker "$LINE" "$CODE"; done < $1
+
+
