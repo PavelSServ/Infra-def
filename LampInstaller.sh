@@ -64,7 +64,7 @@ cp /etc/apache2/sites-available/*.conf /etc/apache2/sites-available/backup/
 echo "Copy config"
 cp  ./testconfig.conf /etc/apache2/sites-available/testdomain.conf
 
-apt install php-curl php-gd php-mbstring php-xml php-xmlrpc php-soap php-intl php-zip
+apt install php-curl php-gd php-mbstring php-xml php-xmlrpc php-soap php-intl php-zip -y
 
 systemctl restart apache2
 
@@ -74,27 +74,43 @@ a2enmod rewrite
 
 apache2ctl configtest
 
-sudo systemctl restart apache2
+systemctl restart apache2
 
+cd /tmp
+
+curl -O https://wordpress.org/latest.tar.gz
+
+tar xzvf latest.tar.gz
+
+touch /tmp/wordpress/.htaccess
+cp /tmp/wordpress/wp-config-sample.php /tmp/wordpress/wp-config.php
+
+mkdir /tmp/wordpress/wp-content/upgrade
+sudo cp -a /tmp/wordpress/. /var/www/wordpress
+
+sudo chown -R www-data:www-data /var/www/wordpress
+sudo find /var/www/wordpress/ -type d -exec chmod 750 {} \;
+sudo find /var/www/wordpress/ -type f -exec chmod 640 {} \;
+curl -s https://api.wordpress.org/secret-key/1.1/salt/
 
 echo "Test"
 
-hecker(){
-    RESPONSE_CODE=$(curl --write-out %{http_code} --silent --output /dev/null $1)
-    CODENUM=$2
+# hecker(){
+#     RESPONSE_CODE=$(curl --write-out %{http_code} --silent --output /dev/null $1)
+#     CODENUM=$2
 
-    if [ "$RESPONSE_CODE" != "$CODENUM" ]; then
-        echo "$LINE : $CODENUM"
-    fi
-}
+#     if [ "$RESPONSE_CODE" != "$CODENUM" ]; then
+#         echo "$LINE : $CODENUM"
+#     fi
+# }
 
-if [ -z $2 ];
-then
-    CODE=$2
-else
-    CODE=200
-fi
+# if [ -z $2 ];
+# then
+#     CODE=$2
+# else
+#     CODE=200
+# fi
 
-while read LINE; do checker "$LINE" "$CODE"; done < $1
+# while read LINE; do checker "$LINE" "$CODE"; done < $1
 
 
